@@ -12,8 +12,7 @@ const IngredientForm = React.memo(props => {
     event.preventDefault();
     // ...
     //console.log(inputTitle, inputAmount);
-    props.submitted({
-      id: Math.random(),
+    props.submitted({      
       title: inputTitle,
       amount: inputAmount
     });
@@ -31,24 +30,24 @@ const IngredientForm = React.memo(props => {
     );
   }
 
-  return (
-    <section className="ingredient-form">
-      <Card>
-        <form onSubmit={submitHandler}>
-          <div className="form-control">
-            <label htmlFor="title">Name</label>
-            <input type="text" id="title" value={inputTitle} onChange={titleChangedHandler} />
-          </div>
-          <div className="form-control">
-            <label htmlFor="amount">Amount</label>
-            <input type="number" id="amount" value={inputAmount} onChange={amountChangedHandler} />
-          </div>
-          <div className="ingredient-form__actions">
-            <button type="submit">Add Ingredient</button>
-          </div>
-        </form>
-      </Card>
-    </section>
+  return (  
+      <section className="ingredient-form">
+        <Card>
+          <form onSubmit={submitHandler}>
+            <div className="form-control">
+              <label htmlFor="title">Name</label>
+              <input type="text" id="title" value={inputTitle} onChange={titleChangedHandler} />
+            </div>
+            <div className="form-control">
+              <label htmlFor="amount">Amount</label>
+              <input type="number" id="amount" value={inputAmount} onChange={amountChangedHandler} />
+            </div>
+            <div className="ingredient-form__actions">
+              <button type="submit">Add Ingredient</button>
+            </div>
+          </form>
+        </Card>
+      </section>
   );
 });
 

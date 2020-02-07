@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import IngredientForm from './IngredientForm';
 import Search from './Search';
@@ -9,6 +9,27 @@ const Ingredients = ()=> {
   const [ingridients, setIngridients] = useState([]);
   const [filteredArray, setFilteredArray] = useState([]);
 
+  useEffect(() => {
+    fetch('https://react-recipes-a3467.firebaseio.com/ingridients.json').then(firebaseDocuments => firebaseDocuments.json()).then(
+      (documents)=>{
+        //console.log(documents);
+        let newArray = [];
+        for(let key in documents){
+          //console.log(key, documents[key]);
+          newArray.push(
+            {
+              id: key,
+              title: documents[key].title,
+              amount: documents[key].amount
+            }
+          );
+        }
+        //console.log(newArray);
+        setIngridients(newArray);
+      }
+    )
+  }, []);
+
   const itemRemoved = (itemId)=>{
     console.log('Item removed...', itemId);
     const newIngridientArray = ingridients.filter(
@@ -17,35 +38,28 @@ const Ingredients = ()=> {
     setIngridients(newIngridientArray);
   }
 
-  const valueChanged = (event)=>{
-    //console.log(event.target.value);
-    const newValue = event.target.value;
-    if(newValue.length !== 0){
-      console.log(event.target.value);
-      setFilteredArray(
-        ingridients.filter(
-          (item)=> item.title.startsWith(newValue)
-        )
-      );      
-    }
-    else{
-      setFilteredArray(ingridients);
-    }
+  const valueChanged = (ingridients)=>{
+    setIngridients(ingridients);
   }
 
   const addIngridient = (newIngridient)=>{
-    fetch('https://react-recipes-6002a.firebaseio.com', {
+    /* console.log(newIngridient);
+    console.log(JSON.stringify(newIngridient)); */
+    fetch('https://react-recipes-a3467.firebaseio.com/ingridients.json', {
       method: 'POST',
-      mode: 'same-origin',
-      body: newIngridient,
+      body: JSON.stringify(newIngridient),
       headers: { 'Content-Type': 'application/json' },      
     }).then(
-      (object)=>{
-        console.log(object);
+      (firebaseDocument)=>{
+        return firebaseDocument.json();
+      }
+    ).then(
+      (document)=>{
+        //console.log(document);
+        setIngridients([...ingridients, { id:document.name, ...newIngridient }]);
       }
     )
-
-    //setIngridients([...ingridients, newIngridient]);
+    //
   }
 
   return (
@@ -54,7 +68,7 @@ const Ingredients = ()=> {
         submitted={addIngridient}
       />
       <section>
-        <Search changed={valueChanged}/>
+        <Search onIngridientsChanged={valueChanged}/>
         {
           ingridients.length === 0 ? null : <IngredientList ingredients={ingridients} onRemoveItem={itemRemoved}/>
         }        

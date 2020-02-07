@@ -2,12 +2,11 @@ import React from 'react';
 
 import './LoadingIndicator.css';
 
-const LoadingIndicator = () => (
+const LoadingIndicator = (props) => (
   <div className="lds-ring">
-    <div />
-    <div />
-    <div />
-    <div />
+    <div>
+      { props.children }
+    </div>
   </div>
 );
 
