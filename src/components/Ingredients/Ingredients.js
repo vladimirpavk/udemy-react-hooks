@@ -2,40 +2,35 @@ import React, { useState, useEffect } from 'react';
 
 import IngredientForm from './IngredientForm';
 import Search from './Search';
-import IngridientList from './IngredientList';
 import IngredientList from './IngredientList';
+
+import LoadingIndicator from '../UI/LoadingIndicator';
+import ErrorModal from '../UI/ErrorModal';
 
 const Ingredients = ()=> {
   const [ingridients, setIngridients] = useState([]);
   const [filteredArray, setFilteredArray] = useState([]);
-
-  useEffect(() => {
-    fetch('https://react-recipes-a3467.firebaseio.com/ingridients.json').then(firebaseDocuments => firebaseDocuments.json()).then(
-      (documents)=>{
-        //console.log(documents);
-        let newArray = [];
-        for(let key in documents){
-          //console.log(key, documents[key]);
-          newArray.push(
-            {
-              id: key,
-              title: documents[key].title,
-              amount: documents[key].amount
-            }
-          );
-        }
-        //console.log(newArray);
-        setIngridients(newArray);
-      }
-    )
-  }, []);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const itemRemoved = (itemId)=>{
-    console.log('Item removed...', itemId);
-    const newIngridientArray = ingridients.filter(
-      arrayItem => arrayItem.id !== itemId    
-    );
-    setIngridients(newIngridientArray);
+    //console.log('Item removed...', itemId);
+    setLoading(true);
+    fetch(`https://react-recipes-a3467.firebaseio.com/ingridients/${itemId}.json`, {
+      method: 'DELETE'     
+    }).then(
+      (firebaseDocument)=>{
+        const newIngridientArray = ingridients.filter(
+          arrayItem => arrayItem.id !== itemId    
+        );
+        setIngridients(newIngridientArray);
+        setLoading(false);
+      }
+    ).catch(
+      (error)=>{
+        setError('Something went wrong !!!');
+      }
+    )   
   }
 
   const valueChanged = (ingridients)=>{
@@ -43,8 +38,7 @@ const Ingredients = ()=> {
   }
 
   const addIngridient = (newIngridient)=>{
-    /* console.log(newIngridient);
-    console.log(JSON.stringify(newIngridient)); */
+    setLoading(true);
     fetch('https://react-recipes-a3467.firebaseio.com/ingridients.json', {
       method: 'POST',
       body: JSON.stringify(newIngridient),
@@ -57,15 +51,27 @@ const Ingredients = ()=> {
       (document)=>{
         //console.log(document);
         setIngridients([...ingridients, { id:document.name, ...newIngridient }]);
+        setLoading(false);
+      }      
+    ).catch(
+      (error)=>{
+        setLoading(false);
+        setError('Something went wrong !!!');
       }
     )
     //
   }
 
+  const errorOnClose = () =>{
+    setError(null);
+  }
+
   return (
     <div className="App">
+      {error && <ErrorModal onClose={errorOnClose}>{error}</ErrorModal>}
       <IngredientForm
         submitted={addIngridient}
+        isLoading={loading}
       />
       <section>
         <Search onIngridientsChanged={valueChanged}/>
