@@ -34,7 +34,7 @@ const Search = React.memo(props => {
             }
         );
           }         
-      }, 700);
+      }, 1000);
       return ()=>{
         clearTimeout(timeout);
       }
