@@ -1,7 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import AuthProvider from './components/context/auth-context';
+
 import './index.css';
 import App from './App';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const MainApp = (props)=>(
+    <AuthProvider>
+        <App />
+    </AuthProvider>
+)
+
+ReactDOM.render(<MainApp />, document.getElementById('root'));
